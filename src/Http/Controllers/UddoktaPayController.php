@@ -11,6 +11,7 @@ use Botble\Base\Http\Responses\BaseHttpResponse;
 use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Supports\PaymentHelper;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class UddoktaPayController extends BaseController
 {
@@ -98,8 +99,10 @@ class UddoktaPayController extends BaseController
         }
 
         do_action(PAYMENT_ACTION_PAYMENT_PROCESSED, [
-            'order_id' => $data['metadata']['order_id'],
+            'order_id' => Arr::first(json_decode($data['metadata']['order_id'])),
+            'charge_id' => $data['transaction_id'],
             'amount' => $data['amount'],
+            'currency' => $data['metadata']['currency'],
             'transaction_id' => $data['transaction_id'],
             'payment_channel' => UddoktaPayServiceProvider::MODULE_NAME,
             'status' => $status,
@@ -108,8 +111,14 @@ class UddoktaPayController extends BaseController
             'payment_type' => 'direct',
         ]);
 
+        $nextUrl = PaymentHelper::getRedirectURL($request->input('metadata.token'));
+
+        if (is_plugin_active('job-board')) {
+            $nextUrl = $nextUrl . '?charge_id=' . $data['transaction_id'];
+        }
+
         return $response
-            ->setNextUrl(PaymentHelper::getRedirectURL($request->input('metadata.token')))
+            ->setNextUrl($nextUrl)
             ->setMessage(__('Checkout successfully!'));
     }
 

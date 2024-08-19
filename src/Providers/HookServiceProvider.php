@@ -30,7 +30,7 @@ class HookServiceProvider extends ServiceProvider
         }, 999, 2);
 
         add_filter(BASE_FILTER_ENUM_LABEL, function ($value, $class): string {
-            if ($class === UddoktaPayServiceProvider::class && $value === UddoktaPayServiceProvider::MODULE_NAME) {
+            if ($class === PaymentMethodEnum::class && $value === UddoktaPayServiceProvider::MODULE_NAME) {
                 $value = 'UddoktaPay';
             }
 
@@ -67,7 +67,6 @@ class HookServiceProvider extends ServiceProvider
             }
 
             $paymentData = apply_filters(PAYMENT_FILTER_PAYMENT_DATA, [], $request);
-
             try {
                 $payUddokta = new UddoktaPayService();
 
@@ -80,8 +79,10 @@ class HookServiceProvider extends ServiceProvider
                         'token' => $paymentData['checkout_token'],
                         'customer_id' => $paymentData['customer_id'],
                         'customer_type' => $paymentData['customer_type'],
+                        'currency' => $paymentData['currency'],
                     ],
                     'redirect_url' => route('payment.uddokta-pay.success'),
+                    'return_type'   => 'GET',
                     'cancel_url' => route('payment.uddokta-pay.error'),
                     'webhook_url' => route('payment.uddokta-pay.webhook'),
                 ]);

@@ -92,8 +92,7 @@ class UddoktaPayService
     {
         $response = $this
             ->request()
-            ->withUrlParameters(['invoice_id' => $referenceNumber])
-            ->post($this->getProcessUrl('/verify-payment'));
+            ->post($this->getProcessUrl('/verify-payment'), ['invoice_id' => $referenceNumber]);
 
         if (! $response->ok()) {
             return [

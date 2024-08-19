@@ -68,6 +68,13 @@
                                 data-counter="400"
                             />
 
+                            <x-core-setting::textarea
+                                name="payment_uddokta_pay_description"
+                                :label="trans('plugins/payment::payment.method_name')"
+                                :value="get_payment_setting('description', $moduleName)"
+                                data-counter="400"
+                            />
+
                             <x-core-setting::text-input
                                 :name="'payment_' . $moduleName . '_api_key'"
                                 type="password"
