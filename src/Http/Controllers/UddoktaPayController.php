@@ -113,7 +113,7 @@ class UddoktaPayController extends BaseController
 
         $nextUrl = PaymentHelper::getRedirectURL($request->input('metadata.token'));
 
-        if (is_plugin_active('job-board')) {
+        if (is_plugin_active('job-board') || is_plugin_active('real-estate')) {
             $nextUrl = $nextUrl . '?charge_id=' . $data['transaction_id'];
         }
 
