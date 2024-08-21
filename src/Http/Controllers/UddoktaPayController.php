@@ -2,6 +2,7 @@
 
 namespace FriendsOfBotble\UddoktaPay\Http\Controllers;
 
+use Botble\Hotel\Models\Booking;
 use FriendsOfBotble\UddoktaPay\Http\Requests\WebhookRequest;
 use FriendsOfBotble\UddoktaPay\Providers\UddoktaPayServiceProvider;
 use FriendsOfBotble\UddoktaPay\Services\UddoktaPayService;
@@ -99,7 +100,7 @@ class UddoktaPayController extends BaseController
         }
 
         do_action(PAYMENT_ACTION_PAYMENT_PROCESSED, [
-            'order_id' => Arr::first(json_decode($data['metadata']['order_id'])),
+            'order_id' => $orderId = json_decode($data['metadata']['order_id']),
             'charge_id' => $data['transaction_id'],
             'amount' => $data['amount'],
             'currency' => $data['metadata']['currency'],
@@ -110,6 +111,22 @@ class UddoktaPayController extends BaseController
             'customer_type' => $data['metadata']['customer_type'],
             'payment_type' => 'direct',
         ]);
+
+        if (is_plugin_active('hotel')) {
+            $booking = Booking::query()
+                ->select('transaction_id')
+                ->find(Arr::first($orderId));
+
+            if (! $booking) {
+                return $response
+                    ->setNextUrl(PaymentHelper::getCancelURL())
+                    ->setMessage(__('Checkout failed!'));
+            }
+
+            return $response
+                ->setNextUrl(PaymentHelper::getRedirectURL($booking->transaction_id))
+                ->setMessage(__('Checkout successfully!'));
+        }
 
         $nextUrl = PaymentHelper::getRedirectURL($request->input('metadata.token'));
 
