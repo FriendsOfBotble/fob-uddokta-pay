@@ -1,5 +1,5 @@
 {
-    "id": "friendsofbotble/uddokta-pay",
+    "id": "friendsofbotble/fob-uddokta-pay",
     "name": "UddoktaPay Payment Gateway",
     "namespace": "FriendsOfBotble\\UddoktaPay\\",
     "provider": "FriendsOfBotble\\UddoktaPay\\Providers\\UddoktaPayServiceProvider",
